@@ -65,14 +65,20 @@
     .image-wrapper.blur img {
       filter: blur(2px);
       opacity: 0.3;
-      transform: scale(0.92);
+      transform: scale(0.85);
     }
 
     .image-wrapper.active img {
       filter: brightness(1.1);
       opacity: 1;
-      transform: scale(1);
+      transform: scale(1.05);
     }
+
+    .image-wrapper.blur .text-top,
+    .image-wrapper.blur .text-bottom {
+    display: none;
+    }
+
   </style>
 </head>
 <body>
