@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fixed Mobile Carousel</title>
+  <title>Smooth Infinite Carousel</title>
   <style>
     * {
       box-sizing: border-box;
@@ -23,8 +23,9 @@
     .carousel {
       display: flex;
       gap: 1rem;
-      overflow-x: scroll;
+      overflow-x: auto;
       scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
       padding: 2rem 0;
       scroll-padding: 0 calc((100vw - 55vw) / 2);
@@ -41,8 +42,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      transition: all 0.3s ease;
-      overflow: visible;
+      transition: all 0.4s ease;
     }
 
     .carousel img {
@@ -50,7 +50,7 @@
       height: auto;
       object-fit: cover;
       border-radius: 12px;
-      transition: all 0.3s ease;
+      transition: all 0.4s ease;
     }
 
     .text-top,
@@ -59,7 +59,7 @@
       text-align: center;
       font-size: 0.9rem;
       color: #333;
-      transition: opacity 0.3s ease;
+      transition: all 0.3s ease;
     }
 
     .image-wrapper.blur img {
@@ -84,21 +84,19 @@
 
 <section class="carousel-section">
   <div class="carousel" id="carousel">
-
     <!-- 12 Cards -->
-    <div class="image-wrapper"><div class="text-top">Person 1 - Top</div><img src="person1.webp" alt="Person 1"><div class="text-bottom">Lorem ipsum dolor sit amet.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 2 - Top</div><img src="person2.webp" alt="Person 2"><div class="text-bottom">Velit esse cillum dolore eu fugiat.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 3 - Top</div><img src="person3.webp" alt="Person 3"><div class="text-bottom">Excepteur sint occaecat cupidatat non.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 4 - Top</div><img src="person4.webp" alt="Person 4"><div class="text-bottom">Sed ut perspiciatis unde omnis iste.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 5 - Top</div><img src="person5.webp" alt="Person 5"><div class="text-bottom">At vero eos et accusamus et iusto.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 6 - Top</div><img src="person6.webp" alt="Person 6"><div class="text-bottom">Ut enim ad minima veniam.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 7 - Top</div><img src="person1.webp" alt="Person 7"><div class="text-bottom">Quis autem vel eum iure reprehenderit.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 8 - Top</div><img src="person2.webp" alt="Person 8"><div class="text-bottom">Nam libero tempore cum soluta nobis.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 9 - Top</div><img src="person3.webp" alt="Person 9"><div class="text-bottom">Temporibus autem quibusdam et aut.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 10 - Top</div><img src="person4.webp" alt="Person 10"><div class="text-bottom">Neque porro quisquam est qui dolorem.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 11 - Top</div><img src="person5.webp" alt="Person 11"><div class="text-bottom">Ut aut reiciendis voluptatibus maiores.</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 12 - Top</div><img src="person6.webp" alt="Person 12"><div class="text-bottom">Lorem ipsum dolor sit amet again.</div></div>
-
+    <div class="image-wrapper"><div class="text-top">Person 1</div><img src="person1.webp"><div class="text-bottom">Text 1</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 2</div><img src="person2.webp"><div class="text-bottom">Text 2</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 3</div><img src="person3.webp"><div class="text-bottom">Text 3</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 4</div><img src="person4.webp"><div class="text-bottom">Text 4</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 5</div><img src="person5.webp"><div class="text-bottom">Text 5</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 6</div><img src="person6.webp"><div class="text-bottom">Text 6</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 7</div><img src="person1.webp"><div class="text-bottom">Text 7</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 8</div><img src="person2.webp"><div class="text-bottom">Text 8</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 9</div><img src="person3.webp"><div class="text-bottom">Text 9</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 10</div><img src="person4.webp"><div class="text-bottom">Text 10</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 11</div><img src="person5.webp"><div class="text-bottom">Text 11</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 12</div><img src="person6.webp"><div class="text-bottom">Text 12</div></div>
   </div>
 </section>
 
@@ -107,11 +105,12 @@
   const originalWrappers = Array.from(carousel.children);
   const cloneCount = 3;
 
-  const prependClones = originalWrappers.slice(-cloneCount).map(node => node.cloneNode(true));
-  const appendClones = originalWrappers.slice(0, cloneCount).map(node => node.cloneNode(true));
+  // Clone first and last few items to simulate infinite loop
+  const prependClones = originalWrappers.slice(-cloneCount).map(n => n.cloneNode(true));
+  const appendClones = originalWrappers.slice(0, cloneCount).map(n => n.cloneNode(true));
 
-  prependClones.forEach(clone => carousel.prepend(clone));
-  appendClones.forEach(clone => carousel.append(clone));
+  prependClones.forEach(c => carousel.prepend(c));
+  appendClones.forEach(c => carousel.append(c));
 
   const wrappers = Array.from(carousel.children);
 
@@ -121,7 +120,6 @@
       const box = wrapper.getBoundingClientRect();
       const wrapperCenter = box.left + box.width / 2;
       const distance = Math.abs(wrapperCenter - window.innerWidth / 2);
-
       wrapper.classList.remove('active', 'blur');
       if (distance < box.width / 2) {
         wrapper.classList.add('active');
@@ -132,23 +130,37 @@
   }
 
   function resetScrollPosition() {
-    const cardWidth = wrappers[0].offsetWidth + 16; // width + gap
+    const cardWidth = wrappers[0].offsetWidth + 16;
     const totalOriginal = originalWrappers.length;
 
     if (carousel.scrollLeft <= cardWidth * (cloneCount - 0.5)) {
+      carousel.style.scrollBehavior = 'auto';
       carousel.scrollLeft += cardWidth * totalOriginal;
+      requestAnimationFrame(() => {
+        carousel.style.scrollBehavior = 'smooth';
+        updateActive();
+      });
     } else if (carousel.scrollLeft >= cardWidth * (totalOriginal + cloneCount + 0.5)) {
+      carousel.style.scrollBehavior = 'auto';
       carousel.scrollLeft -= cardWidth * totalOriginal;
+      requestAnimationFrame(() => {
+        carousel.style.scrollBehavior = 'smooth';
+        updateActive();
+      });
     }
   }
 
+  // Smoothly update active card
   carousel.addEventListener('scroll', () => {
-    window.requestAnimationFrame(() => {
-      updateActive();
-      resetScrollPosition();
-    });
+    window.requestAnimationFrame(updateActive);
   });
 
+  // Reset only when scroll ends
+  carousel.addEventListener('scrollend', () => {
+    resetScrollPosition();
+  });
+
+  // Initial setup
   window.addEventListener('load', () => {
     const initialScroll = wrappers[cloneCount].offsetLeft;
     carousel.scrollLeft = initialScroll;
