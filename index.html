@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simple Smooth Carousel</title>
+  <title>Infinite Carousel</title>
   <style>
     * {
       box-sizing: border-box;
@@ -27,6 +27,7 @@
       scroll-snap-type: x mandatory;
       padding: 2rem;
       scrollbar-width: none;
+      scroll-behavior: auto !important; /* manual control */
     }
 
     .carousel::-webkit-scrollbar {
@@ -79,25 +80,38 @@
 
 <section class="carousel-section">
   <div class="carousel" id="carousel">
-    <!-- Cards (same as yours) -->
-    <div class="image-wrapper"><div class="text-top">Person 1</div><img src="person1.webp"><div class="text-bottom">Text 1</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 2</div><img src="person2.webp"><div class="text-bottom">Text 2</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 3</div><img src="person3.webp"><div class="text-bottom">Text 3</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 4</div><img src="person4.webp"><div class="text-bottom">Text 4</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 5</div><img src="person5.webp"><div class="text-bottom">Text 5</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 6</div><img src="person6.webp"><div class="text-bottom">Text 6</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 7</div><img src="person1.webp"><div class="text-bottom">Text 7</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 8</div><img src="person2.webp"><div class="text-bottom">Text 8</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 9</div><img src="person3.webp"><div class="text-bottom">Text 9</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 10</div><img src="person4.webp"><div class="text-bottom">Text 10</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 11</div><img src="person5.webp"><div class="text-bottom">Text 11</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 12</div><img src="person6.webp"><div class="text-bottom">Text 12</div></div>
+    <!-- Original cards will be duplicated dynamically -->
   </div>
 </section>
 
 <script>
   const carousel = document.getElementById('carousel');
+
+  // Define card data once
+  const people = Array.from({ length: 12 }, (_, i) => ({
+    name: `Person ${i + 1}`,
+    image: `person${(i % 6) + 1}.webp`,
+    text: `Text ${i + 1}`
+  }));
+
+  // Duplicate the data set 3 times (prev-clone, original, next-clone)
+  const allPeople = [...people, ...people, ...people];
+
+  // Render them
+  allPeople.forEach((person, i) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'image-wrapper';
+    wrapper.innerHTML = `
+      <div class="text-top">${person.name}</div>
+      <img src="${person.image}" alt="${person.name}">
+      <div class="text-bottom">${person.text}</div>
+    `;
+    carousel.appendChild(wrapper);
+  });
+
   const wrappers = Array.from(carousel.children);
+  const totalCards = wrappers.length;
+  const originalLength = people.length;
 
   function updateActive() {
     const carouselRect = carousel.getBoundingClientRect();
@@ -138,17 +152,41 @@
     }
   }
 
-  let scrollTimeout;
+  // Handle infinite loop behavior
+  function checkLoopScroll() {
+    const scrollLeft = carousel.scrollLeft;
+    const totalScrollWidth = carousel.scrollWidth;
+    const visibleWidth = carousel.offsetWidth;
 
+    const wrapperWidth = wrappers[0].offsetWidth + parseFloat(getComputedStyle(wrappers[0]).marginRight);
+    const buffer = wrapperWidth * originalLength;
+
+    // Jump from near-start to middle
+    if (scrollLeft < buffer * 0.5) {
+      carousel.scrollLeft += buffer;
+    }
+
+    // Jump from near-end to middle
+    else if (scrollLeft > totalScrollWidth - buffer * 1.5 - visibleWidth) {
+      carousel.scrollLeft -= buffer;
+    }
+  }
+
+  let scrollTimeout;
   carousel.addEventListener('scroll', () => {
+    checkLoopScroll();
     requestAnimationFrame(updateActive);
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(snapToNearestCard, 150);
   });
 
+  // On load, jump to the middle set
   window.addEventListener('load', () => {
-    updateActive();
-    setTimeout(snapToNearestCard, 100);
+    const midIndex = originalLength;
+    wrappers[midIndex].scrollIntoView({ inline: 'center' });
+    setTimeout(() => {
+      updateActive();
+    }, 100);
   });
 
   window.addEventListener('resize', () => {
