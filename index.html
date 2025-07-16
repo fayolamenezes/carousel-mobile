@@ -26,7 +26,7 @@
       gap: 1rem;
       overflow-x: auto;
       padding: 2rem;
-      scroll-behavior: auto; /* use JS smooth scroll */
+      scroll-behavior: auto;
       scrollbar-width: none;
     }
 
@@ -136,6 +136,20 @@
     });
   }
 
+  function centerCard(wrapper) {
+    const wrapperRect = wrapper.getBoundingClientRect();
+    const carouselRect = carousel.getBoundingClientRect();
+    const scrollLeft = carousel.scrollLeft;
+
+    const offset = wrapperRect.left - carouselRect.left;
+    const diff = offset - (carouselRect.width / 2 - wrapperRect.width / 2);
+
+    carousel.scrollTo({
+      left: scrollLeft + diff,
+      behavior: 'smooth'
+    });
+  }
+
   function snapToNearestCard() {
     const carouselRect = carousel.getBoundingClientRect();
     const centerX = carouselRect.left + carouselRect.width / 2;
@@ -154,11 +168,11 @@
     });
 
     if (closest) {
-      closest.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+      centerCard(closest);
     }
   }
 
-  // Smooth infinite scroll loop
+  // Infinite scroll logic
   function checkLoopScroll() {
     const scrollLeft = carousel.scrollLeft;
     const totalScrollWidth = carousel.scrollWidth;
@@ -180,13 +194,13 @@
     checkLoopScroll();
     requestAnimationFrame(updateActive);
     clearTimeout(scrollTimeout);
-    scrollTimeout = setTimeout(snapToNearestCard, 180);
+    scrollTimeout = setTimeout(snapToNearestCard, 150);
   });
 
   // Initial setup
   window.addEventListener('load', () => {
     const middleCard = wrappers[originalLength];
-    middleCard.scrollIntoView({ inline: 'center' });
+    centerCard(middleCard);
     setTimeout(updateActive, 100);
   });
 
