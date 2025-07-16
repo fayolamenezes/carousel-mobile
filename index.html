@@ -18,22 +18,21 @@
 
     .carousel-section {
       padding: 2rem 0;
-      overflow-x: visible;
     }
 
     .carousel {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    padding: 2rem 0;
-    scroll-padding: 0 calc((100vw - 55vw) / 2);
-    scrollbar-width: none; /* Hide scrollbar in Firefox */
+      display: flex;
+      gap: 1rem;
+      overflow-x: scroll;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 2rem 0;
+      scroll-padding: 0 calc((100vw - 55vw) / 2);
+      scrollbar-width: none;
     }
 
     .carousel::-webkit-scrollbar {
-    display: none; /* Hide scrollbar in Chrome, Safari, Edge */
+      display: none;
     }
 
     .image-wrapper {
@@ -60,6 +59,7 @@
       text-align: center;
       font-size: 0.9rem;
       color: #333;
+      transition: opacity 0.3s ease;
     }
 
     .image-wrapper.blur img {
@@ -76,9 +76,8 @@
 
     .image-wrapper.blur .text-top,
     .image-wrapper.blur .text-bottom {
-    display: none;
+      display: none;
     }
-
   </style>
 </head>
 <body>
@@ -86,7 +85,7 @@
 <section class="carousel-section">
   <div class="carousel" id="carousel">
 
-    <!-- Original 12 Cards -->
+    <!-- 12 Cards -->
     <div class="image-wrapper"><div class="text-top">Person 1 - Top</div><img src="person1.webp" alt="Person 1"><div class="text-bottom">Lorem ipsum dolor sit amet.</div></div>
     <div class="image-wrapper"><div class="text-top">Person 2 - Top</div><img src="person2.webp" alt="Person 2"><div class="text-bottom">Velit esse cillum dolore eu fugiat.</div></div>
     <div class="image-wrapper"><div class="text-top">Person 3 - Top</div><img src="person3.webp" alt="Person 3"><div class="text-bottom">Excepteur sint occaecat cupidatat non.</div></div>
@@ -134,13 +133,12 @@
 
   function resetScrollPosition() {
     const cardWidth = wrappers[0].offsetWidth + 16; // width + gap
-    const scrollLeft = carousel.scrollLeft;
     const totalOriginal = originalWrappers.length;
 
-    if (scrollLeft < cardWidth * cloneCount) {
-      carousel.scrollLeft = scrollLeft + cardWidth * totalOriginal;
-    } else if (scrollLeft > cardWidth * (totalOriginal + cloneCount)) {
-      carousel.scrollLeft = scrollLeft - cardWidth * totalOriginal;
+    if (carousel.scrollLeft <= cardWidth * (cloneCount - 0.5)) {
+      carousel.scrollLeft += cardWidth * totalOriginal;
+    } else if (carousel.scrollLeft >= cardWidth * (totalOriginal + cloneCount + 0.5)) {
+      carousel.scrollLeft -= cardWidth * totalOriginal;
     }
   }
 
@@ -152,9 +150,9 @@
   });
 
   window.addEventListener('load', () => {
-    updateActive();
     const initialScroll = wrappers[cloneCount].offsetLeft;
     carousel.scrollLeft = initialScroll;
+    updateActive();
   });
 
   window.addEventListener('resize', updateActive);
