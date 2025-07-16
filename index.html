@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mobile Carousel</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: sans-serif;
+      overflow-x: hidden;
+    }
+
+    .carousel-section {
+      padding: 2rem 0;
+    }
+
+    .carousel {
+      display: flex;
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding: 2rem 1rem;
+    }
+
+    .image-wrapper {
+      scroll-snap-align: center;
+      flex: 0 0 80%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .carousel img {
+      width: 100%;
+      height: auto;
+      max-height: 70vh;
+      object-fit: cover;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .text-top,
+    .text-bottom {
+      margin: 0.5rem;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .image-wrapper.blur img {
+      filter: blur(2px);
+      opacity: 0.2;
+      transform: scale(0.9);
+    }
+
+    .image-wrapper.active img {
+      filter: none;
+      opacity: 1;
+      transform: scale(1.05);
+      z-index: 2;
+    }
+
+    @media(min-width: 768px) {
+      .image-wrapper {
+        flex: 0 0 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<section class="carousel-section">
+  <div class="carousel" id="carousel">
+    <div class="image-wrapper">
+      <div class="text-top">Person 1 - Top</div>
+      <img src="person1.webp" alt="Person 1">
+      <div class="text-bottom">Some description here.</div>
+    </div>
+    <div class="image-wrapper">
+      <div class="text-top">Person 2 - Top</div>
+      <img src="person2.webp" alt="Person 2">
+      <div class="text-bottom">Another description here.</div>
+    </div>
+    <div class="image-wrapper">
+      <div class="text-top">Person 3 - Top</div>
+      <img src="person3.webp" alt="Person 3">
+      <div class="text-bottom">Yet another line.</div>
+    </div>
+    <div class="image-wrapper">
+      <div class="text-top">Person 4 - Top</div>
+      <img src="person4.webp" alt="Person 4">
+      <div class="text-bottom">Fourth description.</div>
+    </div>
+    <!-- Add more cards as needed -->
+  </div>
+</section>
+
+<script>
+  const carousel = document.getElementById('carousel');
+  const wrappers = Array.from(carousel.children);
+
+  function updateActive() {
+    const center = carousel.scrollLeft + carousel.offsetWidth / 2;
+    wrappers.forEach(wrapper => {
+      const box = wrapper.getBoundingClientRect();
+      const wrapperCenter = box.left + box.width / 2;
+      const distance = Math.abs(wrapperCenter - window.innerWidth / 2);
+
+      wrapper.classList.remove('active', 'blur');
+
+      if (distance < box.width / 2) {
+        wrapper.classList.add('active');
+      } else {
+        wrapper.classList.add('blur');
+      }
+    });
+  }
+
+  carousel.addEventListener('scroll', () => {
+    window.requestAnimationFrame(updateActive);
+  });
+
+  window.addEventListener('load', updateActive);
+  window.addEventListener('resize', updateActive);
+</script>
+
+</body>
+</html>
