@@ -38,6 +38,7 @@
     .image-wrapper {
       scroll-snap-align: center;
       flex: 0 0 55vw;
+      min-width: 55vw;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -83,18 +84,12 @@
 
 <section class="carousel-section">
   <div class="carousel" id="carousel">
-    <div class="image-wrapper"><div class="text-top">Person 1</div><img src="person1.webp"><div class="text-bottom">Text 1</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 2</div><img src="person2.webp"><div class="text-bottom">Text 2</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 3</div><img src="person3.webp"><div class="text-bottom">Text 3</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 4</div><img src="person4.webp"><div class="text-bottom">Text 4</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 5</div><img src="person5.webp"><div class="text-bottom">Text 5</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 6</div><img src="person6.webp"><div class="text-bottom">Text 6</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 7</div><img src="person1.webp"><div class="text-bottom">Text 7</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 8</div><img src="person2.webp"><div class="text-bottom">Text 8</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 9</div><img src="person3.webp"><div class="text-bottom">Text 9</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 10</div><img src="person4.webp"><div class="text-bottom">Text 10</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 11</div><img src="person5.webp"><div class="text-bottom">Text 11</div></div>
-    <div class="image-wrapper"><div class="text-top">Person 12</div><img src="person6.webp"><div class="text-bottom">Text 12</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 1</div><img src="person1.webp" loading="eager"><div class="text-bottom">Text 1</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 2</div><img src="person2.webp" loading="eager"><div class="text-bottom">Text 2</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 3</div><img src="person3.webp" loading="eager"><div class="text-bottom">Text 3</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 4</div><img src="person4.webp" loading="eager"><div class="text-bottom">Text 4</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 5</div><img src="person5.webp" loading="eager"><div class="text-bottom">Text 5</div></div>
+    <div class="image-wrapper"><div class="text-top">Person 6</div><img src="person6.webp" loading="eager"><div class="text-bottom">Text 6</div></div>
   </div>
 </section>
 
@@ -103,10 +98,9 @@
   const originalWrappers = Array.from(carousel.children);
   const cloneCount = 3;
 
-  // Clone first and last few items to simulate infinite loop
+  // Clone first and last few items
   const prependClones = originalWrappers.slice(-cloneCount).map(n => n.cloneNode(true));
   const appendClones = originalWrappers.slice(0, cloneCount).map(n => n.cloneNode(true));
-
   prependClones.forEach(c => carousel.prepend(c));
   appendClones.forEach(c => carousel.append(c));
 
@@ -131,28 +125,23 @@
     const cardWidth = wrappers[0].offsetWidth + 16;
     const totalOriginal = originalWrappers.length;
 
+    // Snap back to true center
     if (carousel.scrollLeft <= cardWidth * (cloneCount - 0.5)) {
       carousel.scrollLeft += cardWidth * totalOriginal;
-      requestAnimationFrame(updateActive);
     } else if (carousel.scrollLeft >= cardWidth * (totalOriginal + cloneCount + 0.5)) {
       carousel.scrollLeft -= cardWidth * totalOriginal;
-      requestAnimationFrame(updateActive);
     }
 
-    setTimeout(updateActive, 150); // extra fix
+    requestAnimationFrame(updateActive);
   }
 
-  // Manual scroll debounce
   let scrollTimeout;
-  function onScroll() {
-    window.requestAnimationFrame(updateActive);
+  carousel.addEventListener('scroll', () => {
+    requestAnimationFrame(updateActive);
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(resetScrollPosition, 100);
-  }
+  });
 
-  carousel.addEventListener('scroll', onScroll, { passive: true });
-
-  // Wait for images to fully load before positioning
   function allImagesLoaded(callback) {
     const images = carousel.querySelectorAll('img');
     let loaded = 0;
