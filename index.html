@@ -25,8 +25,6 @@
       gap: 1rem;
       overflow-x: auto;
       scroll-snap-type: x mandatory;
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
       padding: 2rem;
       scrollbar-width: none;
     }
@@ -38,7 +36,6 @@
     .image-wrapper {
       scroll-snap-align: center;
       flex: 0 0 55vw;
-      min-width: 55vw;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -82,6 +79,7 @@
 
 <section class="carousel-section">
   <div class="carousel" id="carousel">
+    <!-- Cards (same as yours) -->
     <div class="image-wrapper"><div class="text-top">Person 1</div><img src="person1.webp"><div class="text-bottom">Text 1</div></div>
     <div class="image-wrapper"><div class="text-top">Person 2</div><img src="person2.webp"><div class="text-bottom">Text 2</div></div>
     <div class="image-wrapper"><div class="text-top">Person 3</div><img src="person3.webp"><div class="text-bottom">Text 3</div></div>
@@ -118,12 +116,45 @@
     });
   }
 
+  function snapToNearestCard() {
+    const carouselRect = carousel.getBoundingClientRect();
+    const centerX = carouselRect.left + carouselRect.width / 2;
+
+    let closest = null;
+    let minDistance = Infinity;
+
+    wrappers.forEach(wrapper => {
+      const box = wrapper.getBoundingClientRect();
+      const wrapperCenter = box.left + box.width / 2;
+      const distance = Math.abs(wrapperCenter - centerX);
+      if (distance < minDistance) {
+        minDistance = distance;
+        closest = wrapper;
+      }
+    });
+
+    if (closest) {
+      closest.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+    }
+  }
+
+  let scrollTimeout;
+
   carousel.addEventListener('scroll', () => {
     requestAnimationFrame(updateActive);
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(snapToNearestCard, 150);
   });
 
-  window.addEventListener('load', updateActive);
-  window.addEventListener('resize', updateActive);
+  window.addEventListener('load', () => {
+    updateActive();
+    setTimeout(snapToNearestCard, 100);
+  });
+
+  window.addEventListener('resize', () => {
+    updateActive();
+    setTimeout(snapToNearestCard, 100);
+  });
 </script>
 
 </body>
