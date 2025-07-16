@@ -27,8 +27,7 @@
       scroll-snap-type: x mandatory;
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
-      padding: 2rem 0;
-      scroll-padding: 0 calc((100vw - 55vw) / 2);
+      padding: 2rem;
       scrollbar-width: none;
     }
 
@@ -103,11 +102,13 @@
   const wrappers = Array.from(carousel.children);
 
   function updateActive() {
-    const center = carousel.scrollLeft + carousel.offsetWidth / 2;
+    const carouselRect = carousel.getBoundingClientRect();
+    const centerX = carouselRect.left + carouselRect.width / 2;
+
     wrappers.forEach(wrapper => {
       const box = wrapper.getBoundingClientRect();
       const wrapperCenter = box.left + box.width / 2;
-      const distance = Math.abs(wrapperCenter - window.innerWidth / 2);
+      const distance = Math.abs(wrapperCenter - centerX);
       wrapper.classList.remove('active', 'blur');
       if (distance < box.width / 2) {
         wrapper.classList.add('active');
