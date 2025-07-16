@@ -84,7 +84,6 @@
 
 <section class="carousel-section">
   <div class="carousel" id="carousel">
-    <!-- 12 Cards -->
     <div class="image-wrapper"><div class="text-top">Person 1</div><img src="person1.webp"><div class="text-bottom">Text 1</div></div>
     <div class="image-wrapper"><div class="text-top">Person 2</div><img src="person2.webp"><div class="text-bottom">Text 2</div></div>
     <div class="image-wrapper"><div class="text-top">Person 3</div><img src="person3.webp"><div class="text-bottom">Text 3</div></div>
@@ -105,7 +104,6 @@
   const originalWrappers = Array.from(carousel.children);
   const cloneCount = 3;
 
-  // Clone first and last few items to simulate infinite loop
   const prependClones = originalWrappers.slice(-cloneCount).map(n => n.cloneNode(true));
   const appendClones = originalWrappers.slice(0, cloneCount).map(n => n.cloneNode(true));
 
@@ -150,21 +148,40 @@
     }
   }
 
-  // Smoothly update active card
+  // Replace unsupported scrollend with scroll + debounce
+  let scrollTimeout;
   carousel.addEventListener('scroll', () => {
     window.requestAnimationFrame(updateActive);
+
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+      resetScrollPosition();
+    }, 100);
   });
 
-  // Reset only when scroll ends
-  carousel.addEventListener('scrollend', () => {
-    resetScrollPosition();
-  });
+  // Wait for images to load before positioning carousel
+  function allImagesLoaded(callback) {
+    const images = carousel.querySelectorAll('img');
+    let loaded = 0;
+    images.forEach(img => {
+      if (img.complete) {
+        loaded++;
+      } else {
+        img.addEventListener('load', () => {
+          loaded++;
+          if (loaded === images.length) callback();
+        });
+      }
+    });
+    if (loaded === images.length) callback();
+  }
 
-  // Initial setup
   window.addEventListener('load', () => {
-    const initialScroll = wrappers[cloneCount].offsetLeft;
-    carousel.scrollLeft = initialScroll;
-    updateActive();
+    allImagesLoaded(() => {
+      const initialScroll = wrappers[cloneCount].offsetLeft;
+      carousel.scrollLeft = initialScroll;
+      updateActive();
+    });
   });
 
   window.addEventListener('resize', updateActive);
