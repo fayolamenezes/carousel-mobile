@@ -18,6 +18,7 @@
     }
 
     .carousel-section {
+      position: relative;
       padding: 2rem 0;
     }
 
@@ -88,24 +89,22 @@
 <body>
 
 <section class="carousel-section">
+  <div class="center-line"></div> <!-- Optional center line -->
   <div class="carousel" id="carousel"></div>
 </section>
 
 <script>
   const carousel = document.getElementById('carousel');
 
-  // Define card content
   const people = Array.from({ length: 12 }, (_, i) => ({
     name: `Person ${i + 1}`,
     image: `person${(i % 6) + 1}.webp`,
     text: `Text ${i + 1}`
   }));
 
-  // Tripling cards for infinite scroll illusion
   const allPeople = [...people, ...people, ...people];
 
-  // Render cards
-  allPeople.forEach(person => {
+  allPeople.forEach((person, i) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'image-wrapper';
     wrapper.innerHTML = `
@@ -172,7 +171,6 @@
     }
   }
 
-  // Infinite scroll logic
   function checkLoopScroll() {
     const scrollLeft = carousel.scrollLeft;
     const totalScrollWidth = carousel.scrollWidth;
@@ -197,11 +195,23 @@
     scrollTimeout = setTimeout(snapToNearestCard, 150);
   });
 
-  // Initial setup
+  // Updated initial setup
   window.addEventListener('load', () => {
-    const middleCard = wrappers[originalLength];
-    centerCard(middleCard);
-    setTimeout(updateActive, 100);
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        const wrapper = wrappers[originalLength]; // start of 2nd batch
+        const wrapperRect = wrapper.getBoundingClientRect();
+        const carouselRect = carousel.getBoundingClientRect();
+
+        // Get exact scrollLeft that centers this wrapper
+        const offset = wrapper.offsetLeft;
+        const scrollTo = offset - (carousel.offsetWidth / 2 - wrapper.offsetWidth / 2);
+
+        carousel.scrollLeft = scrollTo;
+
+        updateActive();
+      });
+    }, 100);
   });
 
   window.addEventListener('resize', () => {
